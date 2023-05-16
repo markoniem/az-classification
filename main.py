@@ -14,9 +14,9 @@ from pickle import dump
 from pickle import load
 import statistics as st
 import sys
-random.seed(0)
-np.random.seed(0)
-tf.random.set_seed(0)
+#random.seed(0)
+#np.random.seed(0)
+#tf.random.set_seed(0)
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
@@ -49,7 +49,6 @@ def get_test_accuracy(test_data, config):
 	accuracy = accuracy_score(np.argmax(y_test, axis=-1), y_predicted)	
 	
 	return accuracy
-
 
 # Majority voting system
 """
@@ -90,6 +89,7 @@ def train_a_fold(X_train, y_train, X_val, y_val, fold, config):
 	pca = PCA(n_components=config.compare_features_size)
 	pca.fit(X_train)
 	X_train = pca.transform(X_train)
+	
 	X_val = pca.transform(X_val)
 	model_dir = './'
 
@@ -117,15 +117,16 @@ def train_a_fold(X_train, y_train, X_val, y_val, fold, config):
 	val_score = model.evaluate(X_val, y_val, verbose=0)[1]
 
 	return train_score, val_score
-							
-def train_n_folds(train_data, config):
+			
+				
+def train_n_folds(train_data, config, iteration):
 	X_train_val = train_data['compare']
 	y_train_val = train_data['y_clf']
 	fold = 0
 	train_accuracies = []
 	val_accuracies = []
 	test_preds = []
-	for train_index, val_index in KFold(config.n_folds).split(X_train_val):
+	for train_index, val_index in KFold(config.n_folds, shuffle=True, random_state=iteration).split(X_train_val):
 		fold += 1
 		X_train, X_val = X_train_val[train_index], X_train_val[val_index]
 		y_train, y_val = y_train_val[train_index], y_train_val[val_index]
@@ -171,11 +172,12 @@ def get_compare_features(compare_filename):
 	compare_features_floats = [float(item) for item in compare_features[1:-1]]
 	return compare_features_floats
 
+
 def create_config():
 	config = EasyDict({
 		'n_folds': 5,
 		'compare_features_size': 21,
-		'n_epochs': 2000,
+		'n_epochs': 200,
 		'batch_size': 16, 
 		'learning_rate': 0.01, 
 		'epsilon': 1e-07,
@@ -199,10 +201,10 @@ X_train = np.concatenate((X_cc, X_cd), axis=0).astype(np.float32)
 y_train = np.concatenate((y_cc, y_cd), axis=0).astype(np.float32)
 filenames_train = np.concatenate((cc_files, cd_files), axis=0)
 
-p = np.random.permutation(108)
-X_train = X_train[p]
-y_train = y_train[p] 
-filenames_train = filenames_train[p]
+# p = np.random.permutation(108)
+# X_train = X_train[p]
+# y_train = y_train[p] 
+# filenames_train = filenames_train[p]
 
 cc_files = sorted(glob.glob(os.path.join(dataset_dir, 'compare/test/cc/*.csv')))
 X_cc = np.array([get_compare_features(f) for f in cc_files])
@@ -218,22 +220,22 @@ X_test = np.concatenate((X_cc, X_cd), axis=0).astype(np.float32)
 y_test = np.concatenate((y_cc, y_cd), axis=0).astype(np.float32)
 filenames_test = np.concatenate((cc_files, cd_files), axis=0)
 
-p = np.random.permutation(48)
-X_test = X_test[p]
-y_test = y_test[p] 
-filenames_test = filenames_test[p]
+# p = np.random.permutation(48)
+# X_test = X_test[p]
+# y_test = y_test[p] 
+# filenames_test = filenames_test[p]
 
 train_data = {'compare': X_train, 'y_clf': y_train}
 test_data = {'compare': X_test, 'y_clf': y_test}
 
 
-# Evaluate results
+#Evaluate results
 train_accuracies = []
 val_accuracies = []
 test_accuracies = []
-for i in range(20):
-	print('Iteration {}'.format(i+1))	
-	train_accuracy, val_accuracy = train_n_folds(train_data, config)
+for iteration in range(20):
+	print('Iteration {}'.format(iteration+1))	
+	train_accuracy, val_accuracy = train_n_folds(train_data, config, iteration)
 	train_accuracies.append(train_accuracy)
 	val_accuracies.append(val_accuracy)
 	test_accuracy = get_test_accuracy(test_data, config)
@@ -254,5 +256,3 @@ f = open('test_accuracies.csv', 'w', newline='', encoding='utf-8')
 writer = csv.writer(f)
 writer.writerow(test_accuracies)
 f.close()
-
-
