@@ -11,9 +11,4 @@
 **Used classifier:** 
 - Multilayer perceptron model (MLP) consisting of ReLU units in a hidden layer and soft-max activation function in an output layer. 
 
-**Current results:**
-- Training data: 89.75% (+/- 2.54%)
-- Validation data: 75.31% (+/- 2.87%)
-- Test data: 63.13% (+/- 3.89%)
-
 
