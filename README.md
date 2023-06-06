@@ -1,6 +1,6 @@
 ### Python implementation for the ADReSS Challenge (2020) (classification task) ###
 
-**Used data:**
+<!-- **Used data:**
 - DementiaBank - Pitt Corpus (selected audios from the Cookie theft picture description task).
 - See: https://dementia.talkbank.org/ADReSS-2020/ 
 
@@ -9,6 +9,6 @@
 - See: https://audeering.github.io/opensmile-python/ 
 
 **Used classifier:** 
-- Multilayer perceptron model (MLP) consisting of ReLU units in a hidden layer and soft-max activation function in an output layer. 
+- Multilayer perceptron model (MLP) consisting of ReLU units in a hidden layer and soft-max activation function in an output layer.  -->
 
 
